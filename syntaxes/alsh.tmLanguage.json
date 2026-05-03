@@ -1,0 +1,311 @@
+{
+  "scopeName": "source.alsh",
+  "name": "Alsh",
+  "fileTypes": ["alsh"],
+  "patterns": [
+    { "include": "#directives" },
+    { "include": "#comments" },
+    { "include": "#struct-definitions" },
+    { "include": "#enum-definitions" },
+    { "include": "#function-definitions" },
+    { "include": "#function-calls" },
+    { "include": "#let-declarations" },
+    { "include": "#foreach-statements" },
+    { "include": "#block-expressions" },
+    { "include": "#c-calls" },
+    { "include": "#std-calls" },
+    { "include": "#command-calls" },
+    { "include": "#keywords" },
+    { "include": "#macro-usage" },
+    { "include": "#variables" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.alsh",
+          "match": "#.*$"
+        },
+        {
+          "name": "comment.line.double-slash.alsh",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "directives": {
+      "patterns": [
+        {
+          "name": "meta.directive.define.alsh",
+          "match": "^\\s*(@define)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s+(.*)$",
+          "captures": {
+            "1": { "name": "keyword.control.alsh" },
+            "2": { "name": "keyword.declaration.macro.alsh" },
+            "3": {
+              "patterns": [
+                { "include": "#variables" },
+                { "include": "#strings" },
+                { "include": "#numbers" },
+                { "name": "constant.other.alsh", "match": "[A-Za-z_][A-Za-z0-9_\\-/\\.]*" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "keyword.control.alsh",
+          "match": "@(include|import|stdlib|main|justrunit|justcarryon|noffi)\\b"
+        }
+      ]
+    },
+    "function-definitions": {
+      "patterns": [
+        {
+          "name": "meta.function.definition.alsh",
+          "match": "\\b(function|fn)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(([^)]*)\\)",
+          "captures": {
+            "1": { "name": "keyword.declaration.function.alsh" },
+            "2": { "name": "entity.name.function.alsh" },
+            "3": { "patterns": [{ "include": "#function-parameters" }] }
+          }
+        }
+      ]
+    },
+    "function-calls": {
+      "patterns": [
+        {
+          "name": "meta.function.call.alsh",
+          "begin": "(?!\\b(?:function|fn|return|if|else|elif|while|for|foreach|loop|interval|count|times|break|continue|scan|switch|case|default|try|catch|finally|then|do|done|endfunction|endfn|endif|endwhile|endfor|endforeach|endloop|endtry|in|true|false|null|struct|enum)\\b)\\b([A-Za-z_][A-Za-z0-9_]*)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": { "name": "entity.name.function.alsh" }
+          },
+          "patterns": [
+            { "include": "#variables" },
+            { "include": "#strings" },
+            { "include": "#numbers" },
+            { "name": "variable.parameter.alsh", "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b" }
+          ]
+        }
+      ]
+    },
+    "function-parameters": {
+      "patterns": [
+        {
+          "name": "variable.parameter.alsh",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "function-call-arguments": {
+      "patterns": [
+        {
+          "include": "#variables"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "name": "variable.parameter.alsh",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "block-expressions": {
+      "patterns": [
+        {
+          "name": "meta.block.alsh",
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#directives" },
+            { "include": "#function-definitions" },
+            { "include": "#function-calls" },
+            { "include": "#let-declarations" },
+            { "include": "#c-calls" },
+            { "include": "#std-calls" },
+            { "include": "#command-calls" },
+            { "include": "#keywords" },
+            { "include": "#macro-usage" },
+            { "include": "#variables" },
+            { "include": "#strings" },
+            { "include": "#numbers" },
+            { "include": "#operators" },
+            { "include": "#block-expressions" }
+          ]
+        }
+      ]
+    },
+    "foreach-statements": {
+      "patterns": [
+        {
+          "name": "keyword.control.foreach.alsh",
+          "match": "\\b(foreach)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s+(in)\\s+([^\\{]+)",
+          "captures": {
+            "1": { "name": "keyword.control.alsh" },
+            "2": { "name": "variable.other.alsh" },
+            "3": { "name": "keyword.control.alsh" },
+            "4": { "patterns": [{ "include": "#variables" }, { "include": "#strings" }, { "include": "#numbers" }] }
+          }
+        }
+      ]
+    },
+    "struct-definitions": {
+      "patterns": [
+        {
+          "name": "meta.struct.definition.alsh",
+          "begin": "\\b(struct)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "1": { "name": "keyword.declaration.struct.alsh" },
+            "2": { "name": "entity.name.type.struct.alsh" }
+          },
+          "patterns": [
+            {
+              "name": "meta.struct.field.alsh",
+              "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\s*:\\s*([A-Za-z_][A-Za-z0-9_]*)",
+              "captures": {
+                "1": { "name": "variable.other.property.alsh" },
+                "2": { "name": "support.type.alsh" }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "enum-definitions": {
+      "patterns": [
+        {
+          "name": "meta.enum.definition.alsh",
+          "begin": "\\b(enum)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "1": { "name": "keyword.declaration.enum.alsh" },
+            "2": { "name": "entity.name.type.enum.alsh" }
+          },
+          "patterns": [
+            {
+              "name": "constant.enum.alsh",
+              "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+            }
+          ]
+        }
+      ]
+    },
+    "let-declarations": {
+      "patterns": [
+        {
+          "name": "meta.variable.declaration.alsh",
+          "match": "\\b(!global\\s+)?(let)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.alsh" },
+            "2": { "name": "keyword.declaration.alsh" },
+            "3": { "name": "variable.other.declaration.alsh" }
+          }
+        }
+      ]
+    },
+    "command-calls": {
+      "patterns": [
+        {
+          "name": "entity.name.function.alsh",
+          "match": "(?:^|\\G)\\s*(?!\\s*(?:let|function|fn|return|if|else|elif|while|for|foreach|loop|interval|count|times|break|continue|scan|switch|case|default|try|catch|finally|then|do|done|endfunction|endfn|endif|endwhile|endfor|endforeach|endloop|endtry|in|true|false|null|struct|enum|std|c)\\b)([A-Za-z_][A-Za-z0-9_\\-/]*)(?!::)"
+        }
+      ]
+    },
+    "c-calls": {
+      "patterns": [
+        {
+          "name": "meta.namespace.alsh",
+          "match": "\\b(c)(::)([A-Za-z_][A-Za-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "support.type.namespace.alsh" },
+            "2": { "name": "punctuation.separator.namespace.alsh" },
+            "3": { "name": "entity.name.function.alsh" }
+          }
+        }
+      ]
+    },
+    "std-calls": {
+      "patterns": [
+        {
+          "name": "meta.namespace.alsh",
+          "match": "\\b(std)(::)([A-Za-z_][A-Za-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "support.type.namespace.alsh" },
+            "2": { "name": "punctuation.separator.namespace.alsh" },
+            "3": { "name": "entity.name.function.alsh" }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.alsh",
+          "match": "\\b(function|fn|return|if|else|elif|while|for|foreach|loop|interval|count|times|break|continue|scan|switch|case|default|try|catch|finally|then|do|done|endfunction|endfn|endif|endwhile|endfor|endforeach|endloop|endtry|in|true|false|null|struct|enum)\\b"
+        }
+      ]
+    },
+    "macro-usage": {
+      "patterns": [
+        {
+          "name": "keyword.declaration.macro.alsh",
+          "match": "\\b[A-Z_][A-Z0-9_]*\\b"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.alsh",
+          "match": "\\$(?:\\{[^}]+\\}|[A-Za-z_][A-Za-z0-9_]*)"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.alsh",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#variables"
+            },
+            {
+              "name": "constant.character.escape.alsh",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.alsh",
+          "begin": "'",
+          "end": "'"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.alsh",
+          "match": "\\b\\d+(?:\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.alsh",
+          "match": "\\b(?:==|!=|<=|>=|&&|\\|\\||[-+*/%<>])\\b"
+        }
+      ]
+    }
+  }
+}

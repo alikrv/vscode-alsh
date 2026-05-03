@@ -1,0 +1,52 @@
+{
+  "name": "alsh-syntax",
+  "displayName": "ALSH",
+  "description": "Syntax highlighting and basic language server support for the ALSH shell language in Visual Studio Code.",
+  "version": "0.0.1",
+  "publisher": "Alina Kravetska",
+  "repository": "https://github.com/alikrv/vscode-alsh",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:alsh"
+  ],
+  "scripts": {
+    "postinstall": "node -e \"console.log('ALSH LSP dependencies installed')\""
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.0.0",
+    "vscode-languageserver": "^8.0.0",
+    "vscode-languageserver-textdocument": "^1.0.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "alsh",
+        "aliases": [
+          "ALSH",
+          "alsh"
+        ],
+        "extensions": [
+          ".alsh"
+        ],
+        "configuration": "./language-configuration.json",
+        "firstLine": "^#!.*\\balsh\\b"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "alsh",
+        "scopeName": "source.alsh",
+        "path": "./syntaxes/alsh.tmLanguage.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "vsce": "^2.15.0"
+  }
+}
