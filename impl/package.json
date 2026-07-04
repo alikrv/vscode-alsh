@@ -3,7 +3,7 @@
   "displayName": "ALSH",
   "description": "Syntax highlighting and basic language server support for the ALSH shell language in Visual Studio Code.",
   "version": "0.0.1",
-  "publisher": "Alina Kravetska",
+  "publisher": "alsh",
   "repository": "https://github.com/alikrv/vscode-alsh",
   "engines": {
     "vscode": "^1.60.0"
