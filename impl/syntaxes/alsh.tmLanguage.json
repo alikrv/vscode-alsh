@@ -5,6 +5,7 @@
   "patterns": [
     { "include": "#directives" },
     { "include": "#comments" },
+    { "include": "#types" },
     { "include": "#struct-definitions" },
     { "include": "#enum-definitions" },
     { "include": "#function-definitions" },
@@ -63,11 +64,12 @@
       "patterns": [
         {
           "name": "meta.function.definition.alsh",
-          "match": "\\b(function|fn)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(([^)]*)\\)",
+          "match": "\\b(function|fn)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(([^)]*)\\)\\s*(noret|[A-Za-z_][A-Za-z0-9_\\*]*)?",
           "captures": {
             "1": { "name": "keyword.declaration.function.alsh" },
             "2": { "name": "entity.name.function.alsh" },
-            "3": { "patterns": [{ "include": "#function-parameters" }] }
+            "3": { "patterns": [{ "include": "#function-parameters" }] },
+            "4": { "name": "support.type.alsh" }
           }
         }
       ]
@@ -94,7 +96,7 @@
       "patterns": [
         {
           "name": "variable.parameter.alsh",
-          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+          "match": "([A-Za-z_][A-Za-z0-9_\\*]*)\\s+([A-Za-z_][A-Za-z0-9_]*)"
         }
       ]
     },
@@ -201,7 +203,7 @@
       "patterns": [
         {
           "name": "meta.variable.declaration.alsh",
-          "match": "\\b(!global\\s+)?(let)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "\\b(!global\\s+)?(let(?:\\s+const)?)\\s+([A-Za-z_][A-Za-z0-9_]*)",
           "captures": {
             "1": { "name": "keyword.control.alsh" },
             "2": { "name": "keyword.declaration.alsh" },
@@ -241,6 +243,18 @@
             "2": { "name": "punctuation.separator.namespace.alsh" },
             "3": { "name": "entity.name.function.alsh" }
           }
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.alsh",
+          "match": "\\b(?:int|float|double|char|str|string|bool|array|noret)\\b"
+        },
+        {
+          "name": "support.type.alsh",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\*+"
         }
       ]
     },
@@ -303,7 +317,7 @@
       "patterns": [
         {
           "name": "keyword.operator.alsh",
-          "match": "\\b(?:==|!=|<=|>=|&&|\\|\\||[-+*/%<>])\\b"
+          "match": "(?:==|!=|<=|>=|&&|\\|\\||->|[&*]|[-+*/%<>])"
         }
       ]
     }

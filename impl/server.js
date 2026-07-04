@@ -6,74 +6,10 @@ const {
   SymbolKind,
 } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
+const { detectSpec, parseSymbols } = require('./specs');
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
-
-function parseSymbols(text, uri) {
-  const symbols = [];
-  const lines = text.split(/\r?\n/);
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const trimmed = line.trim();
-
-    let match = trimmed.match(/^let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=/i);
-    if (match) {
-      const name = match[1];
-      const start = line.indexOf(name);
-      symbols.push({
-        name,
-        kind: SymbolKind.Variable,
-        location: {
-          uri,
-          range: {
-            start: { line: i, character: start },
-            end: { line: i, character: start + name.length },
-          },
-        },
-      });
-      continue;
-    }
-
-    match = trimmed.match(/^\$([A-Za-z_][A-Za-z0-9_]*)\s*=/);
-    if (match) {
-      const name = match[1];
-      const start = line.indexOf(`$${name}`) + 1;
-      symbols.push({
-        name,
-        kind: SymbolKind.Variable,
-        location: {
-          uri,
-          range: {
-            start: { line: i, character: start },
-            end: { line: i, character: start + name.length },
-          },
-        },
-      });
-      continue;
-    }
-
-    match = trimmed.match(/^(?:function|fn)\s+([A-Za-z_][A-Za-z0-9_]*)/i);
-    if (match) {
-      const name = match[1];
-      const start = line.indexOf(name);
-      symbols.push({
-        name,
-        kind: SymbolKind.Function,
-        location: {
-          uri,
-          range: {
-            start: { line: i, character: start },
-            end: { line: i, character: start + name.length },
-          },
-        },
-      });
-    }
-  }
-
-  return symbols;
-}
 
 function getWordAtPosition(document, position) {
   const line = document.getText({
@@ -113,6 +49,11 @@ connection.onDefinition((params) => {
     return null;
   }
 
+  const spec = detectSpec(document.getText());
+  if (spec !== 'compiler' && spec !== 'normal') {
+    return null;
+  }
+
   const word = getWordAtPosition(document, params.position);
   if (!word) {
     return null;
@@ -122,7 +63,7 @@ connection.onDefinition((params) => {
   const symbols = [];
 
   for (const doc of documents.all()) {
-    symbols.push(...parseSymbols(doc.getText(), doc.uri));
+    symbols.push(...parseSymbols(doc.getText(), doc.uri, detectSpec(doc.getText())));
   }
 
   const matches = symbols.filter((symbol) => symbol.name === lookupName);
@@ -139,7 +80,7 @@ connection.onDocumentSymbol((params) => {
     return [];
   }
 
-  return parseSymbols(document.getText(), document.uri).map((symbol) => ({
+  return parseSymbols(document.getText(), document.uri, detectSpec(document.getText())).map((symbol) => ({
     name: symbol.name,
     kind: symbol.kind,
     range: symbol.location.range,
@@ -158,7 +99,7 @@ connection.onHover((params) => {
   }
 
   const lookupName = word.startsWith('$') ? word.slice(1) : word;
-  const symbols = parseSymbols(document.getText(), document.uri);
+  const symbols = parseSymbols(document.getText(), document.uri, detectSpec(document.getText()));
   const match = symbols.find((symbol) => symbol.name === lookupName);
   if (!match) {
     return null;
@@ -179,7 +120,7 @@ connection.onCompletion((params) => {
     return [];
   }
 
-  const symbols = parseSymbols(document.getText(), document.uri);
+  const symbols = parseSymbols(document.getText(), document.uri, detectSpec(document.getText()));
   const unique = new Map();
   for (const symbol of symbols) {
     if (!unique.has(symbol.name)) {

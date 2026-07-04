@@ -1,6 +1,11 @@
 # ALSH Extension for VS Code
 
-Syntax highlighting and language server support for the ALSH shell language.
+Syntax highlighting and language server support for the ALSH programming language.
+### Note:
+The Alsh language has two different specs, with minor differences in syntax.
+The way this extension "chooses" which syntax is by checking wheter the first line
+of the file starts with a shebang (`#!`), if it does, use the "NORMAL SPEC" (shell) syntax,
+if it doesn't, use the "COMPILER spec" (compiled) syntax.
 
 ## Installation (End Users)
 
@@ -24,7 +29,7 @@ The extension will automatically activate for `.alsh` files.
 - strings, numbers, and operators
 - basic LSP support:
   - go to definition for user-defined functions and variables
-  -Development Setup
+  - Development Setup
 
 ### Prerequisites
 - Node.js 14+ and npm
